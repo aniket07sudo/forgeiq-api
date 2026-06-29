@@ -13,7 +13,7 @@
 
     <groupId>org.forgeiq</groupId>
     <artifactId>ForgeIQ-server</artifactId>
-    <version>1.0-0</version>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
