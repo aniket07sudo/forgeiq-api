@@ -50,7 +50,6 @@ public class SecurityConfigProd {
     }
 
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -58,7 +57,8 @@ public class SecurityConfigProd {
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://192.168.1.34:5173",
-                "https://forgeiq.vercel.app"
+                "https://forgeiq.vercel.app",
+                "https://forgeiq-api-production.up.railway.app"
         ));
 
         configuration.setAllowedMethods(List.of(
