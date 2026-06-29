@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5435/ForgeIQ
+    username: postgres
+    password: 3537
+
+server:
+  address: 0.0.0.0
