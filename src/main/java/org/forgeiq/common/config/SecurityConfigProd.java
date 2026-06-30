@@ -38,7 +38,7 @@ public class SecurityConfigProd {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/signup", "/auth/login", "/test").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/demoLogin").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter,
@@ -55,6 +55,7 @@ public class SecurityConfigProd {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
+                "http://localhost:4173",
                 "http://localhost:5173",
                 "http://192.168.1.34:5173",
                 "https://forge-iq-one.vercel.app/",

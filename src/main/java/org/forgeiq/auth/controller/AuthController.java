@@ -38,4 +38,10 @@ public class AuthController {
         String email = principal.getEmail();
         return userService.getCurrentUser(email);
     }
+
+    @PostMapping("/demoLogin")
+    public ResponseEntity<AuthResponse> demoLogin(@RequestBody LoginRequest request) {
+        AuthResponse response = authService.demoLogin(request);
+        return ResponseEntity.ok(response);
+    }
 }

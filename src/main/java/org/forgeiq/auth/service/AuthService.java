@@ -62,4 +62,16 @@ public class AuthService {
                 .refreshToken(refreshToken)
                 .build();
     }
+
+    public AuthResponse demoLogin(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException(("User not found")));
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return AuthResponse.builder()
+                .email(user.getEmail())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 }
