@@ -1,6 +1,6 @@
 package org.forgeiq.common.enums;
 
-public enum StorySource {
+public enum IssueSource {
     AI,
     USER,
     IMPORTED,

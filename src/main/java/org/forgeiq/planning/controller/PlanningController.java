@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/planning")
 @RequiredArgsConstructor
@@ -60,6 +62,24 @@ public class PlanningController {
     @PostMapping("/breakdown/draft")
     public ResponseEntity<Long> saveDraft(@RequestBody BreakdownRequestDto request) {
         Long result = breakdownDraftService.saveDraft(request);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/breakdown/{breakdownId}/epics")
+    public ResponseEntity<List<EpicResponseDto>> getEpics(@PathVariable Long breakdownId) {
+        List<EpicResponseDto> result = planningService.getEpics(breakdownId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/breakdown/{breakdownId}/stories")
+    public ResponseEntity<List<StoryResponseDto>> getStories(@PathVariable Long breakdownId) {
+        List<StoryResponseDto> result = planningService.getStories(breakdownId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/breakdown/{breakdownId}/tasks")
+    public ResponseEntity<List<SubtaskResponseDto>> getTasks(@PathVariable Long breakdownId) {
+        List<SubtaskResponseDto> result = planningService.getTasks(breakdownId);
         return ResponseEntity.ok(result);
     }
 }

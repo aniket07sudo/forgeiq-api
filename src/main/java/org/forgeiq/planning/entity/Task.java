@@ -3,7 +3,9 @@ package org.forgeiq.planning.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.forgeiq.common.enums.StorySource;
+import org.forgeiq.common.enums.ApprovalStatus;
+import org.forgeiq.common.enums.IssueSource;
+import org.forgeiq.common.enums.SyncStatus;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
@@ -39,13 +41,23 @@ public class Task {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "issue_source_enum")
-    private StorySource source = StorySource.AI;
+    private IssueSource source = IssueSource.AI;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "approval_status", columnDefinition = "approval_status_enum")
+    private ApprovalStatus approvalStatus = ApprovalStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "sync_status", columnDefinition = "sync_status_enum")
+    private SyncStatus syncStatus = SyncStatus.NOT_SYNCED;
 
     @Column(name = "issue_key", unique = true)
     private String issueKey;
 
-    @Column(name = "issue_url")
-    private String issueUrl;
+    @Column(name = "last_synced_at")
+    private LocalDateTime lastSyncedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

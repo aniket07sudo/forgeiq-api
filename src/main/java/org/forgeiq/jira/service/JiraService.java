@@ -3,6 +3,7 @@ package org.forgeiq.jira.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.forgeiq.common.enums.BreakdownStatus;
+import org.forgeiq.common.enums.SyncStatus;
 import org.forgeiq.jira.dto.CreateIssueResponse;
 import org.forgeiq.jira.dto.PushToJiraResponse;
 import org.forgeiq.jira.entity.JiraConnection;
@@ -19,8 +20,10 @@ import org.forgeiq.planning.repository.TaskRepository;
 import org.forgeiq.project.entity.Project;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -69,8 +72,9 @@ public class JiraService {
             );
 
             epicsCreated++;
-            epic.setIssueUrl(epicJiraResponse.getSelf());
             epic.setIssueKey(epicJiraResponse.getKey());
+            epic.setSyncStatus(SyncStatus.SYNCED);
+            epic.setLastSyncedAt(LocalDateTime.now());
 
             epicRepository.saveAndFlush(epic);
 
@@ -90,8 +94,9 @@ public class JiraService {
                         null
                 );
 
-                story.setIssueUrl(storyJiraResponse.getSelf());
                 story.setIssueKey(storyJiraResponse.getKey());
+                story.setSyncStatus(SyncStatus.SYNCED);
+                story.setLastSyncedAt(LocalDateTime.now());
                 storiesCreated++;
 
                 storyRepository.saveAndFlush(story);
@@ -112,8 +117,9 @@ public class JiraService {
                     );
 
                     subtasksCreated++;
+                    task.setSyncStatus(SyncStatus.SYNCED);
                     task.setIssueKey(taskJiraResponse.getKey());
-                    task.setIssueUrl(taskJiraResponse.getSelf());
+                    task.setLastSyncedAt(LocalDateTime.now());
                     taskRepository.saveAndFlush(task);
                 }
             }
@@ -136,5 +142,25 @@ public class JiraService {
                 .storiesSkipped(storiesSkipped)
                 .subtasksSkipped(subtasksSkipped)
                 .build();
+    }
+
+    private String buildBreakdownUrl(Breakdown breakdown) {
+        Project project = breakdown.getProject();
+
+        if (project == null || project.getJiraConnection() == null) {
+            return null;
+        }
+
+        String issueKey = breakdown.getEpics().stream()
+                .map(Epic::getIssueKey)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+        if (issueKey == null) {
+            return null;
+        }
+
+        return project.getJiraConnection().getBaseUrl() + "/browse/" + issueKey;
     }
 }

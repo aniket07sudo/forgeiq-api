@@ -4,11 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.forgeiq.auth.entity.User;
 import org.forgeiq.auth.service.GeminiService;
 import org.forgeiq.common.enums.BreakdownStatus;
+import org.forgeiq.common.util.JiraUtils;
 import org.forgeiq.jira.entity.JiraConnection;
 import org.forgeiq.planning.dto.*;
 import org.forgeiq.planning.entity.Breakdown;
 import org.forgeiq.planning.entity.Epic;
+import org.forgeiq.planning.entity.Story;
+import org.forgeiq.planning.entity.Task;
 import org.forgeiq.planning.repository.BreakdownRepository;
+import org.forgeiq.planning.repository.EpicRepository;
+import org.forgeiq.planning.repository.StoryRepository;
+import org.forgeiq.planning.repository.TaskRepository;
 import org.forgeiq.project.entity.Project;
 import org.forgeiq.project.mapper.ProjectMapper;
 import org.springframework.stereotype.Service;
@@ -25,6 +31,9 @@ public class PlanningService {
     private final ObjectMapper objectMapper;
     private final BreakdownPersistenceService breakdownPersistenceService;
     private final BreakdownRepository breakdownRepository;
+    private final EpicRepository epicRepository;
+    private final StoryRepository storyRepository;
+    private final TaskRepository taskRepository;
     private final ProjectMapper projectMapper;
 
     private BreakdownListItemDto toListItem(Breakdown breakdown) {
@@ -410,6 +419,43 @@ public class PlanningService {
                 .build();
     }
 
+    public List<EpicResponseDto> getEpics(Long breakdownId) {
+        List<Epic> epics = epicRepository.findAllByBreakdown_Id(breakdownId);
+        JiraConnection connection = epics.isEmpty() ? null : epics.get(0).getBreakdown().getProject().getJiraConnection();
+        return epics.stream()
+                .map(epic -> toDto(epic, connection))
+                .toList();
+    }
+
+    public List<StoryResponseDto> getStories(Long breakdownId) {
+        Breakdown breakdown = breakdownRepository.findById(breakdownId)
+                .orElseThrow(() -> new RuntimeException("Breakdown not found"));
+
+        JiraConnection connection =
+                breakdown.getProject().getJiraConnection();
+
+        List<Story> stories =
+                storyRepository.findAllByEpic_Breakdown_Id(breakdownId);
+
+        return stories.stream()
+                .map(story -> toDto(story, connection))
+                .toList();
+    }
+
+    public List<SubtaskResponseDto> getTasks(Long breakdownId) {
+        Breakdown breakdown = breakdownRepository.findById(breakdownId)
+                .orElseThrow(() -> new RuntimeException("Breakdown not found"));
+
+        JiraConnection connection =
+                breakdown.getProject().getJiraConnection();
+
+        List<Task> tasks = taskRepository.findAllByStory_Epic_Breakdown_Id(breakdownId);
+
+        return tasks.stream()
+                .map(task -> toDto(task, connection))
+                .toList();
+    }
+
     private BreakdownDetailResponseDto buildDraftResponse(
             Breakdown breakdown,
             Project project,
@@ -430,6 +476,63 @@ public class PlanningService {
                 .createdBy(user.getFirstName())
                 .createdAt(breakdown.getCreatedAt())
                 .updatedAt(breakdown.getUpdatedAt())
+                .build();
+    }
+
+    private SubtaskResponseDto toDto(Task task, JiraConnection connection) {
+        return SubtaskResponseDto.builder()
+                .id(task.getId())
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .issueKey(task.getIssueKey())
+                .position(task.getPosition())
+                .acceptanceCriteria(task.getAcceptanceCriteria())
+                .syncStatus(task.getSyncStatus())
+                .approvalStatus(task.getApprovalStatus())
+                .issueUrl(connection == null
+                        ? null
+                        : JiraUtils.buildIssueUrl(connection.getBaseUrl(), task.getIssueKey()))
+                .lastSyncedAt(task.getLastSyncedAt())
+                .createdAt(task.getCreatedAt())
+                .updatedAt(task.getUpdatedAt())
+                .source(task.getSource())
+                .build();
+    }
+
+    private StoryResponseDto toDto(Story story, JiraConnection connection) {
+        return StoryResponseDto.builder()
+                .id(story.getId())
+                .title(story.getTitle())
+                .description(story.getDescription())
+                .storyPoints(story.getStoryPoints())
+                .issueKey(story.getIssueKey())
+                .position(story.getPosition())
+                .acceptanceCriteria(story.getAcceptanceCriteria())
+                .approvalStatus(story.getApprovalStatus())
+                .syncStatus(story.getSyncStatus())
+                .issueUrl(connection == null
+                        ? null
+                        : JiraUtils.buildIssueUrl(connection.getBaseUrl(), story.getIssueKey()))
+                .lastSyncedAt(story.getLastSyncedAt())
+                .createdAt(story.getCreatedAt())
+                .updatedAt(story.getUpdatedAt())
+                .source(story.getSource())
+                .build();
+    }
+
+    private EpicResponseDto toDto(Epic epic, JiraConnection connection) {
+        return EpicResponseDto.builder()
+                .id(epic.getId())
+                .title(epic.getTitle())
+                .description(epic.getDescription())
+                .storyPoints(epic.getStoryPoints())
+                .issueUrl(JiraUtils.buildIssueUrl(connection.getBaseUrl(), epic.getIssueKey()))
+                .approvalStatus(epic.getApprovalStatus())
+                .syncStatus(epic.getSyncStatus())
+                .issueKey(epic.getIssueKey())
+                .lastSyncedAt(epic.getLastSyncedAt())
+                .createdAt(epic.getCreatedAt())
+                .updatedAt(epic.getUpdatedAt())
                 .build();
     }
 

@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.forgeiq.common.enums.BreakdownStatus;
 import org.forgeiq.common.enums.PriorityEnum;
-import org.forgeiq.common.enums.StorySource;
+import org.forgeiq.common.enums.IssueSource;
 import org.forgeiq.planning.dto.BreakdownRequestDto;
 import org.forgeiq.planning.dto.BreakdownResponseDto;
 import org.forgeiq.planning.dto.StoryDto;
@@ -72,7 +72,7 @@ public class BreakdownPersistenceService {
             story.setPosition(0);
             story.setProjectStatus(defaultProjectStatus);
 //            story.setAcceptanceCriteria(String.join("\n" ,storyDto.getAcceptanceCriteria()));
-            story.setSource(StorySource.AI);
+            story.setSource(IssueSource.AI);
 
             List<Task> subtasks = new ArrayList<>();
 
