@@ -58,7 +58,7 @@ public class SecurityConfigProd {
                 "http://localhost:4173",
                 "http://localhost:5173",
                 "http://192.168.1.34:5173",
-                "https://forge-iq-one.vercel.app/",
+                "https://forge-iq-one.vercel.app",
                 "https://forgeiq-api-production.up.railway.app"
         ));
 
