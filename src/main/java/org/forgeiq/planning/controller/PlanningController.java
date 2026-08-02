@@ -45,19 +45,19 @@ public class PlanningController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/breakdown/{breakdownId}")
-    public ResponseEntity<BreakdownDetailResponseDto> getBreakdownDetails(
-            @PathVariable Long breakdownId,
-            Authentication authentication
-    ) {
-        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
-        Long userId = principal.getId();
-
-        BreakdownDetailResponseDto result =
-                planningService.getBreakdownDetails(breakdownId, userId);
-
-        return ResponseEntity.ok(result);
-    }
+//    @GetMapping("/breakdown/{breakdownId}")
+//    public ResponseEntity<BreakdownDetailResponseDto> getBreakdownDetails(
+//            @PathVariable Long breakdownId,
+//            Authentication authentication
+//    ) {
+//        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+//        Long userId = principal.getId();
+//
+//        BreakdownDetailResponseDto result =
+//                planningService.getBreakdownDetails(breakdownId, userId);
+//
+//        return ResponseEntity.ok(result);
+//    }
 
     @PostMapping("/breakdown/draft")
     public ResponseEntity<Long> saveDraft(@RequestBody BreakdownRequestDto request) {
