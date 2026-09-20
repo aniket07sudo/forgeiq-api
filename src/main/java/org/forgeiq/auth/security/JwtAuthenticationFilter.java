@@ -22,16 +22,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getServletPath();
-        String method = request.getMethod();
-
-        // 1. Skip JWT validation for ALL /auth endpoints (/auth/login, /auth/signup, /auth/demoLogin, etc.)
-        // 2. Skip JWT validation for CORS preflight (OPTIONS) requests
-        return path.startsWith("/auth/") || "OPTIONS".equalsIgnoreCase(method);
-    }
-
-    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
